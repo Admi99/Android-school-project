@@ -82,7 +82,12 @@ class UserPreferencesRepository private constructor(context: Context) {
         }
     }
 
-   
+    suspend fun updateAppStartCounter(value: Int)
+    {
+        dataStore.updateData {
+            it.toBuilder().setAppStartedCounter(value).build()
+        }
+    }
 
 
     suspend fun enableSortByDeadline(enable: Boolean) {

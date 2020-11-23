@@ -87,6 +87,12 @@ class TasksViewModel(
         }
     }
 
+    fun updateStartCounter(value: Int){
+        viewModelScope.launch {
+            userPreferencesRepository.updateAppStartCounter(value + 1)
+        }
+    }
+
     fun showCompletedTasks(show: Boolean) {
         viewModelScope.launch {
             userPreferencesRepository.updateShowCompleted(show)
