@@ -17,6 +17,7 @@
 package com.codelab.android.datastore.ui
 
 import android.os.Bundle
+import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.observe
@@ -30,7 +31,7 @@ class TasksActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityTasksBinding
     private val adapter = TasksAdapter()
-
+    private var wasStarted = false
     private lateinit var viewModel: TasksViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -48,16 +49,37 @@ class TasksActivity : AppCompatActivity() {
         setupFilterListeners(viewModel)
         setupSort()
 
+        /*val actualCounter = viewModel.getAppCounter()
+        binding.appStartCounter.text = actualCounter.toString()
+        viewModel.updateStartCounter(actualCounter)*/
+
         viewModel.tasksUiModel.observe(owner = this) { tasksUiModel ->
             adapter.submitList(tasksUiModel.tasks)
             updateSort(tasksUiModel.sortOrder)
             binding.showCompletedSwitch.isChecked = tasksUiModel.showCompleted
         }
 
+        //viewModel.updateStartCounter(tasksUiModel.startAppCounter + 1)
+        //Log.i("test", viewModel.tasksUiModel.value?.startAppCounter.toString());
+
+        //viewModel.updateStartCounter(viewModel.tasksUiModel.value?.startAppCounter);
+
+        viewModel.tasksUiModel.observe(owner = this) { tasksUiModel ->
+            if(!wasStarted)
+            {
+                adapter.submitList(tasksUiModel.tasks)
+                viewModel.updateStartCounter(tasksUiModel.startAppCounter)
+                binding.appStartCounter.text = tasksUiModel.startAppCounter.toString()
+                wasStarted = true
+            }
+
+
+        }
 
 
 
     }
+
 
     private fun setupFilterListeners(viewModel: TasksViewModel) {
         binding.showCompletedSwitch.setOnCheckedChangeListener { _, checked ->

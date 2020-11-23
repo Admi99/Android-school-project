@@ -16,6 +16,7 @@
 
 package com.codelab.android.datastore.ui
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.asLiveData
@@ -26,13 +27,14 @@ import com.codelab.android.datastore.data.TasksRepository
 import com.codelab.android.datastore.data.UserPreferencesRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
 data class TasksUiModel(
     val tasks: List<Task>,
     val showCompleted: Boolean,
     val sortOrder: UserPreferences.SortOrder,
-    //public val startAppCounter : Int
+    public val startAppCounter : Int
 )
 
 // MutableStateFlow is an experimental API so we're annotating the class accordingly
@@ -42,7 +44,6 @@ class TasksViewModel(
 ) : ViewModel() {
 
     private val userPreferencesFlow = userPreferencesRepository.userPreferencesFlow
-    private var counter = 0;
     // Every time the sort order, the show completed filter or the list of tasks emit,
     // we should recreate the list of tasks
     private val tasksUiModelFlow = combine(
@@ -57,10 +58,21 @@ class TasksViewModel(
             ),
             showCompleted = userPreferences.showCompleted,
             sortOrder = userPreferences.sortOrder,
-            //startAppCounter = userPreferences.appStartedCounter
+            startAppCounter = userPreferences.appStartedCounter
         )
     }
     val tasksUiModel = tasksUiModelFlow.asLiveData()
+
+
+   /*fun getAppCounter(): Int{
+       var counter = 5;
+       userPreferencesFlow.map {
+           counter = it.appStartedCounter
+           Log.i("test", counter.toString());
+       }
+        return counter;
+    }*/
+
 
 
 
@@ -88,9 +100,17 @@ class TasksViewModel(
     }
 
     fun updateStartCounter(value: Int){
-        viewModelScope.launch {
-            userPreferencesRepository.updateAppStartCounter(value + 1)
+        /*if(value == null)
+        {
+            viewModelScope.launch {
+                userPreferencesRepository.updateAppStartCounter(0)
+            }
+        }else{*/
+            viewModelScope.launch {
+                userPreferencesRepository.updateAppStartCounter(value + 1)
+            //}
         }
+
     }
 
     fun showCompletedTasks(show: Boolean) {
