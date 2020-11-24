@@ -64,20 +64,17 @@ class TasksActivity : AppCompatActivity() {
 
         //viewModel.updateStartCounter(viewModel.tasksUiModel.value?.startAppCounter);
 
+        //viewModel.tasksUiModel.run {  }
         viewModel.tasksUiModel.observe(owner = this) { tasksUiModel ->
             if(!wasStarted)
             {
-                adapter.submitList(tasksUiModel.tasks)
                 viewModel.updateStartCounter(tasksUiModel.startAppCounter)
-                binding.appStartCounter.text = tasksUiModel.startAppCounter.toString()
                 wasStarted = true
             }
 
-
+            adapter.submitList(tasksUiModel.tasks)
+            binding.appStartCounter.text = tasksUiModel.startAppCounter.toString()
         }
-
-
-
     }
 
 

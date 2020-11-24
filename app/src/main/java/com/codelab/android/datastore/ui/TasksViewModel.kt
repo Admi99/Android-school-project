@@ -25,16 +25,14 @@ import com.codelab.android.datastore.UserPreferences
 import com.codelab.android.datastore.data.Task
 import com.codelab.android.datastore.data.TasksRepository
 import com.codelab.android.datastore.data.UserPreferencesRepository
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
 data class TasksUiModel(
     val tasks: List<Task>,
     val showCompleted: Boolean,
     val sortOrder: UserPreferences.SortOrder,
-    public val startAppCounter : Int
+    val startAppCounter : Int
 )
 
 // MutableStateFlow is an experimental API so we're annotating the class accordingly
@@ -44,8 +42,13 @@ class TasksViewModel(
 ) : ViewModel() {
 
     private val userPreferencesFlow = userPreferencesRepository.userPreferencesFlow
+
     // Every time the sort order, the show completed filter or the list of tasks emit,
     // we should recreate the list of tasks
+    /*private val startAppCounter = userPreferencesFlow.map {
+        it.appStartedCounter
+    }*/
+
     private val tasksUiModelFlow = combine(
         repository.tasks,
         userPreferencesFlow
@@ -61,20 +64,10 @@ class TasksViewModel(
             startAppCounter = userPreferences.appStartedCounter
         )
     }
+
+
     val tasksUiModel = tasksUiModelFlow.asLiveData()
-
-
-   /*fun getAppCounter(): Int{
-       var counter = 5;
-       userPreferencesFlow.map {
-           counter = it.appStartedCounter
-           Log.i("test", counter.toString());
-       }
-        return counter;
-    }*/
-
-
-
+   //val counterUIFlow = startAppCounter.asLiveData()
 
     private fun filterSortTasks(
         tasks: List<Task>,
@@ -100,15 +93,9 @@ class TasksViewModel(
     }
 
     fun updateStartCounter(value: Int){
-        /*if(value == null)
-        {
-            viewModelScope.launch {
-                userPreferencesRepository.updateAppStartCounter(0)
-            }
-        }else{*/
-            viewModelScope.launch {
-                userPreferencesRepository.updateAppStartCounter(value + 1)
-            //}
+
+        viewModelScope.launch {
+            userPreferencesRepository.updateAppStartCounter(value + 1)
         }
 
     }
